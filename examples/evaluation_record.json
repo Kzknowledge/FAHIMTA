@@ -1,0 +1,14 @@
+{
+  "evaluation_id": "EXAMPLE-001",
+  "input": "Example Hausa evaluation input goes here.",
+  "expected_behavior": "Document the expected behavior before evaluating the target system.",
+  "n_atlas_output": "Populate with the actual N-ATLAS response.",
+  "evaluation_method": "Populate with the documented evaluation method.",
+  "score": null,
+  "error_category": null,
+  "diagnosis": null,
+  "improvement_action": null,
+  "re_evaluation_result": null,
+  "timestamp": null,
+  "version": "0.1.0"
+}
