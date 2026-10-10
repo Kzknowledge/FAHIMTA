@@ -57,3 +57,10 @@ This is one qualitative test case, not an aggregate benchmark result. The evalua
 A first transparent, reviewer-scored evaluation path is now implemented in `src/evaluation/evaluator.py`. It validates reviewer-entered 1–5 ratings, computes their arithmetic mean, and records reviewer-supplied diagnostic tags. Tests for validation and scoring are in `tests/test_evaluator.py`; the method and limitations are documented in `docs/evaluation-method.md`.
 
 **Important:** this is not an automatic semantic evaluator and does not call N-ATLaS. The existing TEST-001 overall score (3/5) remains a qualitative human judgement; no dimension-level ratings were recorded for it, so none have been fabricated. The new tests have been added to the repository, but their execution has not been independently verified in this update.
+
+
+## Human evaluation rubric v1
+
+The evaluator accepts a reviewer-assigned overall score from **0 to 5** using the project's six-level rubric: 5 Excellent, 4 Strong, 3 Adequate, 2 Weak, 1 Poor, and 0 Unusable. The rubric is recorded in the evaluation implementation and exercised by `tests/test_evaluator.py`.
+
+The evaluator records human judgement; it does not automatically judge Hausa semantics. TEST-001 remains **3/5 — Adequate; PASS WITH LIMITATIONS**, based on the existing human review. Exact model backend provenance remains unverified, and direct N-ATLaS integration is not yet implemented.
