@@ -40,9 +40,14 @@ This is not a fresh clone and not a test of every repository file. The result mu
 
 ## GitHub Actions status
 
-The workflow run associated with commit `6d8e5357c5c23c7e815854141b528609172354b1` (run ID `38074596654`) has conclusion `failure`. The job endpoint returned no step summaries, and the job-log endpoint returned no available log artifact. Earlier account messaging stated that jobs were not started because the GitHub account was locked due to a billing/trade-controls eligibility restriction.
+Two latest workflow runs were inspected:
 
-Accordingly, this failure is not evidence that the Python tests failed. It is also not evidence that they passed in GitHub Actions. A successful CI run remains unverified.
+- Run `38074596654`, for commit `6d8e5357c5c23c7e815854141b528609172354b1`: conclusion `failure`.
+- Run `38074867984`, for commit `50bc84669ea15436a911246f0c78f4b0e168e8bb`: conclusion `failure`.
+
+For the latest run, the job endpoint returned a completed job with conclusion `failure` but no step summaries. The job-log endpoint returned no available log artifact. Earlier account messaging stated that jobs were not started because the GitHub account was locked due to a billing/trade-controls eligibility restriction. The available run metadata does not expose test execution output, so the cause cannot be independently confirmed from logs.
+
+Accordingly, these failures are not evidence that the Python tests failed. They are also not evidence that they passed in GitHub Actions. A successful CI run remains unverified.
 
 ## Remaining verification work
 
