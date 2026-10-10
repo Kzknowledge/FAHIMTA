@@ -1,8 +1,8 @@
-"""Transparent rubric-based evaluation for recorded model outputs.
+"""Transparent human-scored evaluation for recorded model outputs.
 
-This module does not infer semantic quality automatically. A reviewer supplies
-dimension ratings; FAHIMTA validates the ratings, computes a transparent mean,
-and records the evidence and limitations.
+The overall score is assigned by a reviewer using FAHIMTA's documented 0–5
+rubric. This module validates and records that judgement; it does not infer
+semantic quality automatically.
 """
 from typing import Mapping, Optional, Protocol, Sequence
 
@@ -10,24 +10,51 @@ from .models import EvaluationRecord
 
 
 class NAtlasAdapter(Protocol):
-    """Minimal adapter boundary for an actual N-ATLAS integration."""
+    """Minimal adapter boundary for an actual N-ATLaS integration."""
 
     def evaluate(self, input_text: str) -> str:
         """Return the target system's response for an input."""
         ...
 
 
-DEFAULT_DIMENSIONS = (
-    "core_meaning",
-    "goal_orientation",
-    "individual_and_collective_scope",
-    "non_force_methods",
-    "contextual_valence",
-)
+SCORE_LABELS = {
+    0: "Unusable",
+    1: "Poor",
+    2: "Weak",
+    3: "Adequate",
+    4: "Strong",
+    5: "Excellent",
+}
+
+SCORE_DESCRIPTIONS = {
+    5: (
+        "Gives the broad definition, includes goal-oriented effort and "
+        "overcoming difficulty, recognizes individual/collective and "
+        "peaceful/nonviolent forms, and notes contextual valence."
+    ),
+    4: (
+        "Correctly explains sustained effort toward a goal or overcoming "
+        "hardship; includes at least one non-force dimension such as rights, "
+        "progress, or change."
+    ),
+    3: (
+        "Captures effort/struggle against difficulty but is somewhat narrow, "
+        "repetitive, or misses collective/social change."
+    ),
+    2: (
+        "Gives only a partial or overly physical meaning, such as fighting "
+        "or defeating someone, without the broader sense of striving or resistance."
+    ),
+    1: "Wrong meaning, major factual/linguistic error, or irrelevant response.",
+    0: (
+        "No meaningful answer, refusal without reason, or response in the "
+        "wrong language."
+    ),
+}
 
 
 class Evaluator:
-    """Create a structured record from reviewer-provided rubric ratings."""
+    """Validate and record a reviewer-assigned score using rubric version 1."""
 
     def evaluate_case(
         self,
@@ -35,18 +62,14 @@ class Evaluator:
         input_text: str,
         expected_behavior: str,
         n_atlas_output: str,
-        rubric_scores: Optional[Mapping[str, int]] = None,
+        overall_score: Optional[int] = None,
         diagnostic_tags: Optional[Sequence[str]] = None,
+        reviewer_rationale: Optional[str] = None,
         evaluation_method: str = "human_rubric_v1",
         timestamp: Optional[str] = None,
         system_version: Optional[str] = None,
     ) -> EvaluationRecord:
-        """Validate 1–5 ratings and record their arithmetic mean.
-
-        Ratings must be supplied by a human reviewer; they are not inferred
-        from the text. The mean is descriptive and is not a probability,
-        model-accuracy estimate, or statistically validated benchmark score.
-        """
+        """Record a human score from 0 to 5; no score is inferred by the code."""
         if not evaluation_id.strip():
             raise ValueError("evaluation_id must not be empty")
         if not input_text.strip():
@@ -57,23 +80,11 @@ class Evaluator:
             raise ValueError("n_atlas_output must not be empty")
         if not evaluation_method.strip():
             raise ValueError("evaluation_method must not be empty")
-        if not rubric_scores:
-            raise ValueError(
-                "rubric_scores are required; FAHIMTA does not automatically "
-                "infer semantic quality"
-            )
+        if overall_score is None:
+            raise ValueError("overall_score is required; provide a human rating from 0 to 5")
+        if isinstance(overall_score, bool) or not isinstance(overall_score, int) or not 0 <= overall_score <= 5:
+            raise ValueError("overall_score must be an integer from 0 to 5")
 
-        unknown = set(rubric_scores) - set(DEFAULT_DIMENSIONS)
-        if unknown:
-            raise ValueError(f"Unknown rubric dimensions: {sorted(unknown)}")
-        if not set(rubric_scores).issubset(DEFAULT_DIMENSIONS):
-            raise ValueError("Invalid rubric dimensions")
-        for dimension, rating in rubric_scores.items():
-            if isinstance(rating, bool) or not isinstance(rating, int) or not 1 <= rating <= 5:
-                raise ValueError(f"{dimension} must be an integer from 1 to 5")
-
-        # Score is the unrounded arithmetic mean of reviewer-entered ratings.
-        score = sum(rubric_scores.values()) / len(rubric_scores)
         tags = list(diagnostic_tags or [])
         diagnosis = (
             "reviewer_flagged_limitations" if tags else "no_issue_tagged_by_reviewer"
@@ -84,7 +95,12 @@ class Evaluator:
             else "retain_record_and_monitor"
         )
         context = f"; system_version={system_version}" if system_version else ""
-        method = f"{evaluation_method}; ratings={dict(rubric_scores)}{context}"
+        rationale = f"; rationale={reviewer_rationale}" if reviewer_rationale else ""
+        method = (
+            f"{evaluation_method}; score_label={SCORE_LABELS[overall_score]}"
+            f"; score_description={SCORE_DESCRIPTIONS[overall_score]}"
+            f"{rationale}{context}"
+        )
 
         return EvaluationRecord(
             evaluation_id=evaluation_id,
@@ -92,7 +108,7 @@ class Evaluator:
             expected_behavior=expected_behavior,
             n_atlas_output=n_atlas_output,
             evaluation_method=method,
-            score=score,
+            score=float(overall_score),
             error_category=",".join(tags) if tags else None,
             diagnosis=diagnosis,
             improvement_action=action,
