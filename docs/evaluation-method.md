@@ -1,14 +1,27 @@
 # Evaluation Method
 
-## MVP method: reviewer-scored rubric
+## MVP method: reviewer-assigned overall score
 
-FAHIMTA accepts a recorded input, reference/expected behaviour, target-system output, and explicit human reviewer ratings. The evaluator validates the record and calculates the arithmetic mean of the supplied ratings. It does **not** automatically infer semantic correctness from text.
+FAHIMTA records a target-system input, expected/reference behaviour, captured output, and one explicit human-assigned overall score from 0 to 5. The evaluator validates and records that judgement; it does not automatically infer semantic correctness from text and does not calculate a mean across dimension ratings.
 
 Implementation: `src/evaluation/evaluator.py`.
 
-## Rubric dimensions
+## Overall score rubric
 
-Ratings use an integer scale from 1 to 5 for any explicitly assessed dimensions:
+The current implementation uses the following six-level rubric:
+
+- **5 — Excellent:** Gives the broad definition, includes goal-oriented effort and overcoming difficulty, recognizes individual/collective and peaceful/nonviolent forms, and notes contextual valence.
+- **4 — Strong:** Correctly explains sustained effort toward a goal or overcoming hardship; includes at least one non-force dimension such as rights, progress, or change.
+- **3 — Adequate:** Captures effort/struggle against difficulty but is somewhat narrow, repetitive, or misses collective/social change.
+- **2 — Weak:** Gives only a partial or overly physical meaning, such as fighting or defeating someone, without the broader sense of striving or resistance.
+- **1 — Poor:** Wrong meaning, major factual/linguistic error, or irrelevant response.
+- **0 — Unusable:** No meaningful answer, refusal without reason, or response in the wrong language.
+
+The score is a reviewer judgement. It is not a probability, automated semantic score, accuracy estimate, or statistically validated benchmark result.
+
+## Proposed future dimensions (not implemented as score inputs)
+
+The following dimensions may support more granular future reviews:
 
 1. `core_meaning` — whether the core meaning is represented.
 2. `goal_orientation` — whether goals such as progress, rights, justice, or change are represented where relevant.
@@ -16,13 +29,9 @@ Ratings use an integer scale from 1 to 5 for any explicitly assessed dimensions:
 4. `non_force_methods` — whether non-force means are recognized where relevant.
 5. `contextual_valence` — whether the response preserves context-dependent positive/negative meaning.
 
-Reviewers must provide a short rationale and supporting evidence in the case record. Ratings must not be backfilled or invented to fit a previously assigned overall judgement. The five dimensions are a proposed operational rubric and should be validated by Hausa-language reviewers before formal benchmark use.
+These dimensions are proposed and should be reviewed by Hausa-language reviewers before formal benchmark use. The current evaluator does not accept dimension-level ratings or compute their arithmetic mean. Do not report such scores unless the implementation and case records are explicitly extended to support them.
 
-## Score interpretation and limitations
-
-The implementation computes the unrounded arithmetic mean of the reviewer-entered dimension ratings. This number is descriptive only: it is not a probability, automated semantic score, accuracy estimate, or statistically validated benchmark result. Because a subset of dimensions can be supplied, reports must list which dimensions were actually rated.
-
-The existing TEST-001 judgement of 3/5 was a qualitative overall human assessment. No dimension-level ratings were recorded for that assessment, so the implementation must not manufacture dimension ratings or claim that the code independently reproduced that score.
+The existing TEST-001 judgement of 3/5 was a qualitative overall human assessment. No dimension-level ratings were recorded for that assessment, so none should be manufactured or claimed to have been reproduced by code.
 
 ## Diagnostic tags
 
@@ -32,11 +41,10 @@ Reviewer-supplied tags may include `semantic-narrowing`, `confrontation-overemph
 
 1. Preserve the exact input and target-system output.
 2. Preserve the reference answer and evaluation method version.
-3. Have a reviewer rate relevant rubric dimensions from 1 to 5 and explain each rating.
-4. Record diagnostic tags only when supported by the response.
-5. Compute and record the mean of the ratings actually supplied.
-6. Review suggested follow-up actions; a recommendation is not an intervention.
-7. Re-evaluate after a documented intervention using the same procedure where possible.
+3. Assign one overall score from 0 to 5 using the rubric above.
+4. Record a short reviewer rationale and diagnostic tags only when supported by the response.
+5. Review suggested follow-up actions; a recommendation is not an intervention.
+6. Re-evaluate after a documented intervention using the same procedure where possible.
 
 ## N-ATLaS integration
 
