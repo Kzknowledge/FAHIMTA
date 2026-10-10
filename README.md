@@ -37,3 +37,16 @@ FAHIMTA/
 ## Evidence discipline
 
 No benchmark scores, statistical significance, superiority claims, or production-readiness claims are included without evidence.
+
+
+## Latest evaluation result
+
+**Test record:** [FAHIMTA-NATLAS-TEST-001](results/FAHIMTA-NATLAS-TEST-001.md)
+
+- **Input:** “Menene ake nufi da gwagwarmaya?”
+- **Review:** Human evaluation against the project-established Hausa standard reference.
+- **Result:** **3/5 — Adequate; PASS WITH LIMITATIONS.**
+- **Finding:** The captured response broadly explains effort and overcoming difficulty, but narrows *gwagwarmaya* toward confrontation and omits important rights-based, collective, and social-change meanings.
+- **Evidence limitation:** The response was captured from a public N-ATLaS-branded demo. Exact backend revision/settings and direct FAHIMTA integration remain unverified.
+
+This is one qualitative test case, not an aggregate benchmark result. The evaluator and verified N-ATLaS integration remain pending.
