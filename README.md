@@ -50,3 +50,10 @@ No benchmark scores, statistical significance, superiority claims, or production
 - **Evidence limitation:** The response was captured from a public N-ATLaS-branded demo. Exact backend revision/settings and direct FAHIMTA integration remain unverified.
 
 This is one qualitative test case, not an aggregate benchmark result. The evaluator and verified N-ATLaS integration remain pending.
+
+
+## Evaluation logic status (2026-10-10)
+
+A first transparent, reviewer-scored evaluation path is now implemented in `src/evaluation/evaluator.py`. It validates reviewer-entered 1–5 ratings, computes their arithmetic mean, and records reviewer-supplied diagnostic tags. Tests for validation and scoring are in `tests/test_evaluator.py`; the method and limitations are documented in `docs/evaluation-method.md`.
+
+**Important:** this is not an automatic semantic evaluator and does not call N-ATLaS. The existing TEST-001 overall score (3/5) remains a qualitative human judgement; no dimension-level ratings were recorded for it, so none have been fabricated. The new tests have been added to the repository, but their execution has not been independently verified in this update.
